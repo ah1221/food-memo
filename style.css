@@ -588,20 +588,32 @@ h1 {
   background: #88e4ff;
 }
 
-.lookupPerplexity {
-  background: #b794f6;
+.lookupAutoFill {
+  background: linear-gradient(135deg, #ffd166, #ff9f43);
   color: #1a1a2e;
+  font-size: 1rem;
+  padding: 14px;
 }
 
-.lookupPerplexity:hover {
-  background: #c5a8f8;
+.lookupAutoFill:hover {
+  background: linear-gradient(135deg, #ffdd88, #ffb060);
+}
+
+.lookupAutoFill:disabled {
+  background: #4a5570;
+  color: #9aa0b4;
+  cursor: not-allowed;
 }
 
 .lookupHint {
   margin-top: 4px;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: #9aa0b4;
-  line-height: 1.4;
+  line-height: 1.45;
+}
+
+.lookupHint.autoFillError {
+  color: #ff6b6b;
 }
 
 /* モーダル内の写真エリア */

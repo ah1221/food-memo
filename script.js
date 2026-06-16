@@ -34,7 +34,8 @@ const photoSearchBtn = document.getElementById('photoSearchBtn');
 const photoUrlInput = document.getElementById('photoUrlInput');
 const photoUrlBtn = document.getElementById('photoUrlBtn');
 const lookupGoogleBtn = document.getElementById('lookupGoogleBtn');
-const lookupPerplexityBtn = document.getElementById('lookupPerplexityBtn');
+const autoFillBtn = document.getElementById('autoFillBtn');
+const autoFillStatus = document.getElementById('autoFillStatus');
 
 // メモのデータ配列（{ id, name, eaten, photo, ... } の形式で持つ）
 let foods = loadFoods();
@@ -585,14 +586,63 @@ lookupGoogleBtn.addEventListener('click', () => {
   window.open(url, '_blank', 'noopener');
 });
 
-// 🤖 Perplexity AI：質問文を投げて回答を直接表示してもらう
-lookupPerplexityBtn.addEventListener('click', () => {
+// 🤖 AIで自動入力：Vercel関数 /api/lookup を呼んでフィールドに自動セット
+autoFillBtn.addEventListener('click', async () => {
   if (currentSearchFoodId === null) return;
   const target = foods.find((food) => food.id === currentSearchFoodId);
   if (!target) return;
-  const question = `${target.name}という商品の販売期間、値段、買えるお店を教えて`;
-  const url = `https://www.perplexity.ai/?q=${encodeURIComponent(question)}`;
-  window.open(url, '_blank', 'noopener');
+
+  // ボタンを無効化＆ローディング表示
+  autoFillBtn.disabled = true;
+  const originalText = autoFillBtn.textContent;
+  autoFillBtn.textContent = '⏳ AI が調査中...';
+  autoFillStatus.textContent = 'ネット検索しています（10〜20秒ほどかかります）';
+  autoFillStatus.classList.remove('autoFillError');
+
+  try {
+    const response = await fetch('/api/lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: target.name })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'APIエラー');
+    }
+
+    // 取得した内容を入力欄に反映（既に何か入っていたら上書きしない）
+    let filledCount = 0;
+    if (data.period && !periodInput.value.trim()) {
+      periodInput.value = data.period;
+      filledCount++;
+    }
+    if (data.price && !priceInput.value.trim()) {
+      priceInput.value = data.price;
+      filledCount++;
+    }
+    if (data.location && !storeNameInput.value.trim()) {
+      storeNameInput.value = data.location;
+      filledCount++;
+    }
+
+    // 自動保存を発火させる
+    saveStoreDetails(periodInput);
+
+    // ステータス更新
+    if (filledCount > 0) {
+      autoFillStatus.textContent = `✅ ${filledCount}項目を自動入力しました。内容を確認して必要なら修正してください。`;
+    } else {
+      autoFillStatus.textContent = '⚠️ 既に入力済みのため、上書きしませんでした。空欄にしてから再実行すると上書きされます。';
+    }
+  } catch (error) {
+    autoFillStatus.textContent = `❌ エラー: ${error.message}`;
+    autoFillStatus.classList.add('autoFillError');
+  } finally {
+    autoFillBtn.disabled = false;
+    autoFillBtn.textContent = originalText;
+  }
 });
 
 // オーバーレイ部分をクリックでも閉じる
