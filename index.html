@@ -26,13 +26,20 @@
       <button type="submit">追加</button>
     </form>
 
-    <!-- 残数表示 -->
+    <!-- 残数表示 & 表示切替 -->
     <div class="status">
-      <span id="remainCount">0</span> 個のリストがあります
+      <span class="statusText"><span id="remainCount">0</span> 個のリストがあります</span>
+      <div class="viewToggle">
+        <button type="button" id="listViewBtn" class="viewBtn active" title="リスト表示">📋</button>
+        <button type="button" id="tileViewBtn" class="viewBtn" title="タイル表示">🖼️</button>
+      </div>
     </div>
 
     <!-- リスト表示エリア -->
     <ul id="foodList" class="foodList"></ul>
+
+    <!-- タイル表示エリア -->
+    <div id="foodTiles" class="foodTiles hidden"></div>
 
     <!-- 何も無いときの表示 -->
     <p id="emptyMessage" class="emptyMessage">まだ何もメモがありません ✏️</p>
@@ -43,6 +50,19 @@
     <div class="modal">
       <button class="modalCloseBtn" id="modalCloseBtn" title="閉じる">×</button>
       <h2>「<span id="modalFoodName"></span>」のお店を探す</h2>
+
+      <!-- 写真アップロードエリア -->
+      <div class="photoArea">
+        <div id="photoPreview" class="photoPreview">
+          <span class="photoPlaceholder">📷 写真がまだありません</span>
+        </div>
+        <div class="photoBtns">
+          <label for="photoInput" class="photoUploadBtn">📷 写真を追加 / 変更</label>
+          <button type="button" id="photoDeleteBtn" class="photoDeleteBtn hidden">🗑️ 写真を削除</button>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" hidden>
+      </div>
+
       <p class="modalNote">どのサービスで探しますか？</p>
       <div class="modalLinks">
         <a id="linkTabelog" href="#" target="_blank" rel="noopener" class="modalLink tabelog">

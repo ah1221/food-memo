@@ -85,12 +85,19 @@ h1 {
   transform: scale(0.96);
 }
 
-/* 残数表示 */
+/* 残数表示 & 表示切替 */
 .status {
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   color: #9aa0b4;
   font-size: 0.9rem;
   margin-bottom: 12px;
+  gap: 10px;
+}
+
+.statusText {
+  flex: 1;
 }
 
 #remainCount {
@@ -98,9 +105,132 @@ h1 {
   font-weight: bold;
 }
 
+/* 表示切替ボタン */
+.viewToggle {
+  display: flex;
+  gap: 4px;
+  background: #1f2940;
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.viewBtn {
+  background: transparent;
+  border: none;
+  color: #9aa0b4;
+  font-size: 1.1rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.viewBtn:hover {
+  color: #fff;
+}
+
+.viewBtn.active {
+  background: #ffd166;
+  color: #1a1a2e;
+}
+
 /* リスト */
 .foodList {
   list-style: none;
+}
+
+.foodList.hidden,
+.foodTiles.hidden {
+  display: none;
+}
+
+/* タイル表示 */
+.foodTiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.foodTile {
+  position: relative;
+  background: #25304a;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border: 2px solid transparent;
+}
+
+.foodTile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.foodTile.favorite {
+  border-color: #ffb347;
+}
+
+.foodTile.eaten {
+  opacity: 0.55;
+}
+
+/* タイルの写真エリア */
+.tilePhoto {
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #2c3a5c, #1f2940);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: #6b7290;
+}
+
+.tilePhoto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* タイルのテキスト部分 */
+.tileText {
+  padding: 10px 12px 12px;
+}
+
+.tileName {
+  font-size: 0.95rem;
+  font-weight: bold;
+  word-break: break-word;
+  margin-bottom: 4px;
+}
+
+.tileStore {
+  font-size: 0.75rem;
+  color: #66d9ff;
+  word-break: break-word;
+}
+
+.tileMeta {
+  font-size: 0.7rem;
+  color: #ffb347;
+  margin-top: 2px;
+  word-break: break-word;
+}
+
+/* タイルの右上にお気に入りマーク */
+.tileFav {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
 }
 
 .foodItem {
@@ -152,6 +282,16 @@ h1 {
 
 .favBtn:hover {
   color: #ffd166;
+}
+
+/* リスト項目内の小さいサムネイル */
+.listThumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #1f2940;
 }
 
 /* 食べ物名と店名をまとめるブロック */
@@ -377,6 +517,80 @@ h1 {
 .modalLinkText small {
   color: #9aa0b4;
   font-size: 0.8rem;
+}
+
+/* モーダル内の写真エリア */
+.photoArea {
+  margin: 14px 0 16px;
+}
+
+.photoPreview {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #25304a;
+  border: 2px dashed #2e3a55;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.photoPreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photoPlaceholder {
+  color: #6b7290;
+  font-size: 0.9rem;
+}
+
+.photoBtns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.photoUploadBtn,
+.photoDeleteBtn {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  border: none;
+  white-space: nowrap;
+}
+
+.photoUploadBtn {
+  background: #ffd166;
+  color: #1a1a2e;
+  display: inline-block;
+}
+
+.photoUploadBtn:hover {
+  background: #ffdd88;
+}
+
+.photoDeleteBtn {
+  background: #25304a;
+  color: #ff6b6b;
+  border: 1px solid #2e3a55;
+}
+
+.photoDeleteBtn:hover {
+  background: #2e3a55;
+}
+
+.photoDeleteBtn.hidden {
+  display: none;
 }
 
 /* お店メモ欄（モーダル下部） */
