@@ -18,6 +18,8 @@ const linkTabelog = document.getElementById('linkTabelog');
 const linkUberEats = document.getElementById('linkUberEats');
 const linkGoogleMaps = document.getElementById('linkGoogleMaps');
 const storeNameInput = document.getElementById('storeNameInput');
+const periodInput = document.getElementById('periodInput');
+const priceInput = document.getElementById('priceInput');
 
 // メモのデータ配列（{ id, name, eaten } の形式で持つ）
 let foods = loadFoods();
@@ -36,6 +38,8 @@ addForm.addEventListener('submit', (event) => {
     id: Date.now(),
     name: name,
     storeName: '',
+    period: '',
+    price: '',
     favorite: false,
     eaten: false
   };
@@ -99,6 +103,17 @@ function renderList() {
       storeSpan.className = 'storeName';
       storeSpan.textContent = `📍 ${food.storeName}`;
       textBlock.appendChild(storeSpan);
+    }
+
+    // 期間・値段の表示（どちらかが入っていれば表示）
+    if (food.period || food.price) {
+      const metaSpan = document.createElement('span');
+      metaSpan.className = 'metaInfo';
+      const parts = [];
+      if (food.period) parts.push(`🏷️ ${food.period}`);
+      if (food.price) parts.push(`💴 ${food.price}`);
+      metaSpan.textContent = parts.join('  ');
+      textBlock.appendChild(metaSpan);
     }
 
     // 検索サービスへの直リンクをインラインで貼る
@@ -215,25 +230,29 @@ function openSearchModal(foodId, foodName) {
   linkUberEats.href = `https://www.ubereats.com/jp/search?q=${encoded}`;
   linkGoogleMaps.href = `https://www.google.com/maps/search/${encoded}`;
 
-  // 既に保存されている店名を入力欄に反映
+  // 既に保存されている内容を各入力欄に反映
   const targetFood = foods.find((food) => food.id === foodId);
   storeNameInput.value = targetFood && targetFood.storeName ? targetFood.storeName : '';
+  periodInput.value = targetFood && targetFood.period ? targetFood.period : '';
+  priceInput.value = targetFood && targetFood.price ? targetFood.price : '';
 
   // モーダルを表示
   searchModal.classList.remove('hidden');
 }
 
-// 店名を保存する（自動保存）
-function saveStoreName() {
+// 店名・対象期間・値段を自動保存する
+function saveStoreDetails(triggerElement) {
   if (currentSearchFoodId === null) return;
 
-  // 入力された店名を取り出す
+  // 各入力欄の値を取り出す
   const newStoreName = storeNameInput.value.trim();
+  const newPeriod = periodInput.value.trim();
+  const newPrice = priceInput.value.trim();
 
   // 対象のメモを更新
   foods = foods.map((food) => {
     if (food.id === currentSearchFoodId) {
-      return { ...food, storeName: newStoreName };
+      return { ...food, storeName: newStoreName, period: newPeriod, price: newPrice };
     }
     return food;
   });
@@ -242,11 +261,12 @@ function saveStoreName() {
   saveFoods();
   renderList();
 
-  // 緑色フラッシュで保存を視覚的に伝える
-  storeNameInput.classList.add('savedFlash');
+  // 緑色フラッシュで保存を視覚的に伝える（変更があった欄に出す）
+  const target = triggerElement || storeNameInput;
+  target.classList.add('savedFlash');
   clearTimeout(saveFlashTimer);
   saveFlashTimer = setTimeout(() => {
-    storeNameInput.classList.remove('savedFlash');
+    target.classList.remove('savedFlash');
   }, 600);
 }
 
@@ -262,11 +282,13 @@ function closeSearchModal() {
 modalCloseBtn.addEventListener('click', closeSearchModal);
 
 // 入力した瞬間に自動保存（タイピングごとに保存）
-storeNameInput.addEventListener('input', saveStoreName);
+storeNameInput.addEventListener('input', () => saveStoreDetails(storeNameInput));
+periodInput.addEventListener('input', () => saveStoreDetails(periodInput));
+priceInput.addEventListener('input', () => saveStoreDetails(priceInput));
 
 // サービスリンクをクリックしたら、その時点の入力内容を保存
 [linkTabelog, linkUberEats, linkGoogleMaps].forEach((link) => {
-  link.addEventListener('click', saveStoreName);
+  link.addEventListener('click', () => saveStoreDetails(storeNameInput));
 });
 
 // オーバーレイ部分をクリックでも閉じる

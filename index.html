@@ -71,7 +71,7 @@
       <!-- お店メモ欄：見つけた店をメモする -->
       <div class="storeMemoArea">
         <label for="storeNameInput" class="storeMemoLabel">
-          📍 見つけた店をメモする
+          📍 場所（買えるお店）
         </label>
         <input
           type="text"
@@ -80,8 +80,32 @@
           maxlength="100"
           autocomplete="off"
         >
+
+        <!-- 期間限定情報 -->
+        <label for="periodInput" class="storeMemoLabel periodLabel">
+          🏷️ 対象期間（期間限定の場合）
+        </label>
+        <input
+          type="text"
+          id="periodInput"
+          placeholder="例：6月30日まで"
+          maxlength="60"
+          autocomplete="off"
+        >
+
+        <label for="priceInput" class="storeMemoLabel periodLabel">
+          💴 値段
+        </label>
+        <input
+          type="text"
+          id="priceInput"
+          placeholder="例：1,200円"
+          maxlength="30"
+          autocomplete="off"
+        >
+
         <p class="storeMemoHint">
-          入力するだけで自動保存されます。後から ⭐ ボタンでお気に入りにできます。
+          全部の項目が自動保存されます。空欄でもOK、後から書き足せます。
         </p>
       </div>
     </div>
