@@ -33,6 +33,8 @@ const photoDeleteBtn = document.getElementById('photoDeleteBtn');
 const photoSearchBtn = document.getElementById('photoSearchBtn');
 const photoUrlInput = document.getElementById('photoUrlInput');
 const photoUrlBtn = document.getElementById('photoUrlBtn');
+const lookupGoogleBtn = document.getElementById('lookupGoogleBtn');
+const lookupPerplexityBtn = document.getElementById('lookupPerplexityBtn');
 
 // メモのデータ配列（{ id, name, eaten, photo, ... } の形式で持つ）
 let foods = loadFoods();
@@ -572,6 +574,26 @@ priceInput.addEventListener('input', () => saveStoreDetails(priceInput));
 
 // Mapsリンクをクリックしたら、その時点の入力内容を保存
 linkGoogleMaps.addEventListener('click', () => saveStoreDetails(storeNameInput));
+
+// 🔍 Google検索：「料理名 期間限定 値段 店舗」のスマート検索を新タブで開く
+lookupGoogleBtn.addEventListener('click', () => {
+  if (currentSearchFoodId === null) return;
+  const target = foods.find((food) => food.id === currentSearchFoodId);
+  if (!target) return;
+  const query = `${target.name} 期間限定 値段 店舗 メニュー`;
+  const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  window.open(url, '_blank', 'noopener');
+});
+
+// 🤖 Perplexity AI：質問文を投げて回答を直接表示してもらう
+lookupPerplexityBtn.addEventListener('click', () => {
+  if (currentSearchFoodId === null) return;
+  const target = foods.find((food) => food.id === currentSearchFoodId);
+  if (!target) return;
+  const question = `${target.name}という商品の販売期間、値段、買えるお店を教えて`;
+  const url = `https://www.perplexity.ai/?q=${encodeURIComponent(question)}`;
+  window.open(url, '_blank', 'noopener');
+});
 
 // オーバーレイ部分をクリックでも閉じる
 searchModal.addEventListener('click', (event) => {
