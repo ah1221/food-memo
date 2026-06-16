@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>食べたいものメモ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🍴 食べたいものメモ</h1>
+      <p class="subtitle">いつか食べたいもの、忘れないうちにメモしよう</p>
+    </header>
+
+    <!-- 入力エリア -->
+    <form id="addForm" class="addForm">
+      <input
+        type="text"
+        id="foodInput"
+        placeholder="例：あの店のラーメン"
+        maxlength="100"
+        autocomplete="off"
+        required
+      >
+      <button type="submit">追加</button>
+    </form>
+
+    <!-- 残数表示 -->
+    <div class="status">
+      <span id="remainCount">0</span> 個のリストがあります
+    </div>
+
+    <!-- リスト表示エリア -->
+    <ul id="foodList" class="foodList"></ul>
+
+    <!-- 何も無いときの表示 -->
+    <p id="emptyMessage" class="emptyMessage">まだ何もメモがありません ✏️</p>
+  </div>
+
+  <!-- お店検索のポップアップ -->
+  <div id="searchModal" class="modalOverlay hidden">
+    <div class="modal">
+      <button class="modalCloseBtn" id="modalCloseBtn" title="閉じる">×</button>
+      <h2>「<span id="modalFoodName"></span>」のお店を探す</h2>
+      <p class="modalNote">どのサービスで探しますか？</p>
+      <div class="modalLinks">
+        <a id="linkTabelog" href="#" target="_blank" rel="noopener" class="modalLink tabelog">
+          <span class="modalLinkIcon">🍽️</span>
+          <span class="modalLinkText">
+            <strong>食べログ</strong>
+            <small>近くの人気店を探す</small>
+          </span>
+        </a>
+        <a id="linkUberEats" href="#" target="_blank" rel="noopener" class="modalLink ubereats">
+          <span class="modalLinkIcon">🛵</span>
+          <span class="modalLinkText">
+            <strong>Uber Eats</strong>
+            <small>すぐ届けてもらう</small>
+          </span>
+        </a>
+        <a id="linkGoogleMaps" href="#" target="_blank" rel="noopener" class="modalLink gmaps">
+          <span class="modalLinkIcon">🗺️</span>
+          <span class="modalLinkText">
+            <strong>Google Maps</strong>
+            <small>地図で近くを探す</small>
+          </span>
+        </a>
+      </div>
+
+      <!-- お店メモ欄：見つけた店をメモする -->
+      <div class="storeMemoArea">
+        <label for="storeNameInput" class="storeMemoLabel">
+          📍 見つけた店をメモする
+        </label>
+        <input
+          type="text"
+          id="storeNameInput"
+          placeholder="例：〇〇ラーメン 渋谷店"
+          maxlength="100"
+          autocomplete="off"
+        >
+        <p class="storeMemoHint">
+          入力するだけで自動保存されます。後から ⭐ ボタンでお気に入りにできます。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,434 @@
+/* ダークテーマの基本設定 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e6e6e6;
+  min-height: 100vh;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+/* メインのコンテナ */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* ヘッダー */
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #ffd166;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #9aa0b4;
+  font-size: 0.95rem;
+}
+
+/* 入力フォーム */
+.addForm {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#foodInput {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 1rem;
+  background: #25304a;
+  color: #fff;
+  border: 2px solid #2e3a55;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#foodInput:focus {
+  border-color: #ffd166;
+}
+
+#foodInput::placeholder {
+  color: #6b7290;
+}
+
+.addForm button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  background: #ffd166;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.2s;
+}
+
+.addForm button:hover {
+  background: #ffdd88;
+}
+
+.addForm button:active {
+  transform: scale(0.96);
+}
+
+/* 残数表示 */
+.status {
+  text-align: right;
+  color: #9aa0b4;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+#remainCount {
+  color: #ffd166;
+  font-weight: bold;
+}
+
+/* リスト */
+.foodList {
+  list-style: none;
+}
+
+.foodItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  background: #25304a;
+  border-radius: 8px;
+  border-left: 4px solid #ffd166;
+  transition: opacity 0.2s, transform 0.2s;
+  animation: slideIn 0.25s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* お気に入りのスタイル */
+.foodItem.favorite {
+  background: #2c2f4a;
+  border-left-color: #ffb347;
+  box-shadow: 0 0 0 1px rgba(255, 209, 102, 0.25);
+}
+
+/* 食べた済みのスタイル */
+.foodItem.eaten {
+  opacity: 0.5;
+  border-left-color: #4caf50;
+}
+
+.foodItem.eaten .foodName {
+  text-decoration: line-through;
+  color: #9aa0b4;
+}
+
+/* お気に入りボタンのホバー色 */
+.favBtn {
+  font-size: 1.3rem;
+}
+
+.favBtn:hover {
+  color: #ffd166;
+}
+
+/* 食べ物名と店名をまとめるブロック */
+.foodText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.foodName {
+  word-break: break-word;
+}
+
+/* 保存された店名の表示 */
+.storeName {
+  font-size: 0.85rem;
+  color: #66d9ff;
+  word-break: break-word;
+}
+
+/* インラインのクイックリンク（食べログ・Uber Eats・Maps） */
+.quickLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.quickLink {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  background: #1f2940;
+  color: #9aa0b4;
+  border: 1px solid #2e3a55;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.quickLink:hover {
+  background: #2e3a55;
+  color: #ffd166;
+  border-color: #ffd166;
+}
+
+/* ボタン共通 */
+.iconBtn {
+  background: transparent;
+  border: none;
+  color: #e6e6e6;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.iconBtn:hover {
+  background: #2e3a55;
+}
+
+.eatBtn:hover {
+  color: #4caf50;
+}
+
+.deleteBtn:hover {
+  color: #ff6b6b;
+}
+
+/* 何もないとき */
+.emptyMessage {
+  text-align: center;
+  color: #6b7290;
+  padding: 40px 20px;
+  font-size: 0.95rem;
+}
+
+.emptyMessage.hidden {
+  display: none;
+}
+
+/* 検索ボタン専用のホバー色 */
+.searchBtn:hover {
+  color: #66d9ff;
+}
+
+/* モーダル：背景の暗いオーバーレイ */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 14, 28, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modalOverlay.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* モーダル本体 */
+.modal {
+  position: relative;
+  background: #1f2940;
+  border: 1px solid #2e3a55;
+  border-radius: 12px;
+  padding: 30px 24px 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal h2 {
+  font-size: 1.1rem;
+  color: #ffd166;
+  margin-bottom: 6px;
+  padding-right: 30px;
+  word-break: break-word;
+}
+
+.modalNote {
+  color: #9aa0b4;
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+}
+
+/* 閉じるボタン */
+.modalCloseBtn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #9aa0b4;
+  font-size: 1.6rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+}
+
+.modalCloseBtn:hover {
+  background: #2e3a55;
+  color: #fff;
+}
+
+/* リンク一覧 */
+.modalLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modalLink {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #25304a;
+  border: 1px solid #2e3a55;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #e6e6e6;
+  transition: background 0.2s, transform 0.1s, border-color 0.2s;
+}
+
+.modalLink:hover {
+  background: #2e3a55;
+  border-color: #ffd166;
+}
+
+.modalLink:active {
+  transform: scale(0.98);
+}
+
+.modalLinkIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.modalLinkText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modalLinkText strong {
+  font-size: 1rem;
+}
+
+.modalLinkText small {
+  color: #9aa0b4;
+  font-size: 0.8rem;
+}
+
+/* お店メモ欄（モーダル下部） */
+.storeMemoArea {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #2e3a55;
+}
+
+.storeMemoLabel {
+  display: block;
+  color: #ffd166;
+  font-size: 0.95rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#storeNameInput {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  background: #25304a;
+  color: #fff;
+  border: 2px solid #2e3a55;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#storeNameInput:focus {
+  border-color: #ffd166;
+}
+
+#storeNameInput::placeholder {
+  color: #6b7290;
+}
+
+/* 入力欄の右側に「保存済み」のインジケーター */
+#storeNameInput.savedFlash {
+  border-color: #4caf50;
+}
+
+.storeMemoHint {
+  margin-top: 8px;
+  color: #6b7290;
+  font-size: 0.8rem;
+}
+
+/* スマホ対応 */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .addForm {
+    flex-direction: column;
+  }
+
+  .addForm button {
+    width: 100%;
+  }
+}
