@@ -32,6 +32,7 @@ const priceInput = document.getElementById('priceInput');
 const photoPreview = document.getElementById('photoPreview');
 const photoInput = document.getElementById('photoInput');
 const photoDeleteBtn = document.getElementById('photoDeleteBtn');
+const photoAutoBtn = document.getElementById('photoAutoBtn');
 
 // メモのデータ配列（{ id, name, eaten, photo, ... } の形式で持つ）
 let foods = loadFoods();
@@ -69,6 +70,85 @@ addForm.addEventListener('submit', (event) => {
   // 入力欄をクリア
   foodInput.value = '';
   foodInput.focus();
+
+  // 写真を自動取得（バックグラウンドで実行）
+  autoFetchPhoto(newFood.id, name);
+});
+
+// 食べ物名から写真URLを自動取得して保存する
+// force=true のときは既存写真があっても上書きする
+async function autoFetchPhoto(foodId, foodName, force = false) {
+  // 1. まず Wikipedia 日本語版を試す（有名料理に強い）
+  const wikiUrl = await tryWikipediaImage(foodName);
+  if (wikiUrl) {
+    applyAutoPhoto(foodId, wikiUrl, force);
+    return;
+  }
+
+  // 2. フォールバック：Loremflickr で関連画像を取得
+  // 食べ物名 + ,food でキーワード検索、lockは毎回変えて違う画像が出るようにする
+  const lock = force ? Date.now() : foodId;
+  const flickrUrl = `https://loremflickr.com/600/400/${encodeURIComponent(foodName + ',food')}?lock=${lock}`;
+  applyAutoPhoto(foodId, flickrUrl, force);
+}
+
+// Wikipedia 日本語版の要約APIから画像URLを取り出す
+async function tryWikipediaImage(foodName) {
+  try {
+    const url = `https://ja.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(foodName)}`;
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const data = await response.json();
+    // 元サイズがあれば優先、なければサムネ
+    if (data.originalimage && data.originalimage.source) {
+      return data.originalimage.source;
+    }
+    if (data.thumbnail && data.thumbnail.source) {
+      return data.thumbnail.source;
+    }
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+// 取得した写真URLを該当メモに反映
+function applyAutoPhoto(foodId, photoUrl, force = false) {
+  // 既にユーザが手動で写真を入れていたら原則上書きしない（force=trueなら上書き）
+  const target = foods.find((food) => food.id === foodId);
+  if (!target) return;
+  if (target.photo && !force) return;
+
+  foods = foods.map((food) => {
+    if (food.id === foodId) {
+      return { ...food, photo: photoUrl };
+    }
+    return food;
+  });
+  saveFoods();
+
+  // モーダルが該当メモを開いているならプレビューも更新
+  if (currentSearchFoodId === foodId) {
+    updatePhotoPreview(photoUrl);
+  }
+  renderList();
+}
+
+// 「🔄 自動取得」ボタン：その場で再取得して上書きする
+photoAutoBtn.addEventListener('click', async () => {
+  if (currentSearchFoodId === null) return;
+  const target = foods.find((food) => food.id === currentSearchFoodId);
+  if (!target) return;
+
+  // ボタンを一時的に無効化＆ローディング表示
+  photoAutoBtn.disabled = true;
+  const originalText = photoAutoBtn.textContent;
+  photoAutoBtn.textContent = '⏳ 取得中...';
+
+  await autoFetchPhoto(target.id, target.name, true);
+
+  photoAutoBtn.disabled = false;
+  photoAutoBtn.textContent = originalText;
 });
 
 // リスト・タイル両方を画面に表示する
@@ -118,6 +198,8 @@ function createListItem(food) {
     thumb.className = 'listThumb';
     thumb.src = food.photo;
     thumb.alt = food.name;
+    // 読み込み失敗したらサムネ自体を消す
+    thumb.addEventListener('error', () => thumb.remove());
     li.appendChild(thumb);
   }
 
@@ -222,6 +304,11 @@ function createTileItem(food) {
     const img = document.createElement('img');
     img.src = food.photo;
     img.alt = food.name;
+    // 失敗したら絵文字に切り替え
+    img.addEventListener('error', () => {
+      img.remove();
+      photoArea.textContent = '🍴';
+    });
     photoArea.appendChild(img);
   } else {
     // 写真がないときは絵文字プレースホルダ
