@@ -32,7 +32,9 @@ const priceInput = document.getElementById('priceInput');
 const photoPreview = document.getElementById('photoPreview');
 const photoInput = document.getElementById('photoInput');
 const photoDeleteBtn = document.getElementById('photoDeleteBtn');
-const photoAutoBtn = document.getElementById('photoAutoBtn');
+const photoSearchBtn = document.getElementById('photoSearchBtn');
+const photoUrlInput = document.getElementById('photoUrlInput');
+const photoUrlBtn = document.getElementById('photoUrlBtn');
 
 // メモのデータ配列（{ id, name, eaten, photo, ... } の形式で持つ）
 let foods = loadFoods();
@@ -70,55 +72,10 @@ addForm.addEventListener('submit', (event) => {
   // 入力欄をクリア
   foodInput.value = '';
   foodInput.focus();
-
-  // 写真を自動取得（バックグラウンドで実行）
-  autoFetchPhoto(newFood.id, name);
 });
 
-// 食べ物名から写真URLを自動取得して保存する
-// force=true のときは既存写真があっても上書きする
-async function autoFetchPhoto(foodId, foodName, force = false) {
-  // 1. まず Wikipedia 日本語版を試す（有名料理に強い）
-  const wikiUrl = await tryWikipediaImage(foodName);
-  if (wikiUrl) {
-    applyAutoPhoto(foodId, wikiUrl, force);
-    return;
-  }
-
-  // 2. フォールバック：Loremflickr で関連画像を取得
-  // 食べ物名 + ,food でキーワード検索、lockは毎回変えて違う画像が出るようにする
-  const lock = force ? Date.now() : foodId;
-  const flickrUrl = `https://loremflickr.com/600/400/${encodeURIComponent(foodName + ',food')}?lock=${lock}`;
-  applyAutoPhoto(foodId, flickrUrl, force);
-}
-
-// Wikipedia 日本語版の要約APIから画像URLを取り出す
-async function tryWikipediaImage(foodName) {
-  try {
-    const url = `https://ja.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(foodName)}`;
-    const response = await fetch(url);
-    if (!response.ok) return null;
-    const data = await response.json();
-    // 元サイズがあれば優先、なければサムネ
-    if (data.originalimage && data.originalimage.source) {
-      return data.originalimage.source;
-    }
-    if (data.thumbnail && data.thumbnail.source) {
-      return data.thumbnail.source;
-    }
-    return null;
-  } catch (error) {
-    return null;
-  }
-}
-
-// 取得した写真URLを該当メモに反映
-function applyAutoPhoto(foodId, photoUrl, force = false) {
-  // 既にユーザが手動で写真を入れていたら原則上書きしない（force=trueなら上書き）
-  const target = foods.find((food) => food.id === foodId);
-  if (!target) return;
-  if (target.photo && !force) return;
-
+// 写真URLを該当メモに保存する
+function applyPhotoUrl(foodId, photoUrl) {
   foods = foods.map((food) => {
     if (food.id === foodId) {
       return { ...food, photo: photoUrl };
@@ -134,21 +91,42 @@ function applyAutoPhoto(foodId, photoUrl, force = false) {
   renderList();
 }
 
-// 「🔄 自動取得」ボタン：その場で再取得して上書きする
-photoAutoBtn.addEventListener('click', async () => {
+// 「🔍 画像を探す」ボタン：Google画像検索を新しいタブで開く
+photoSearchBtn.addEventListener('click', () => {
   if (currentSearchFoodId === null) return;
   const target = foods.find((food) => food.id === currentSearchFoodId);
   if (!target) return;
+  // 食べ物名 + 店名 + 値段 を検索ワードにしてプレスリリース寄りの結果を狙う
+  const parts = [target.name];
+  if (target.storeName) parts.push(target.storeName);
+  const query = parts.join(' ');
+  const url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`;
+  window.open(url, '_blank', 'noopener');
+});
 
-  // ボタンを一時的に無効化＆ローディング表示
-  photoAutoBtn.disabled = true;
-  const originalText = photoAutoBtn.textContent;
-  photoAutoBtn.textContent = '⏳ 取得中...';
+// URL貼り付けボタン：入力されたURLを写真として保存
+photoUrlBtn.addEventListener('click', () => {
+  if (currentSearchFoodId === null) return;
+  const inputUrl = photoUrlInput.value.trim();
+  if (!inputUrl) {
+    alert('画像URLを貼り付けてください');
+    return;
+  }
+  // 簡易バリデーション：http/https で始まること
+  if (!/^https?:\/\//i.test(inputUrl)) {
+    alert('http:// または https:// で始まるURLを入力してください');
+    return;
+  }
+  applyPhotoUrl(currentSearchFoodId, inputUrl);
+  photoUrlInput.value = '';
+});
 
-  await autoFetchPhoto(target.id, target.name, true);
-
-  photoAutoBtn.disabled = false;
-  photoAutoBtn.textContent = originalText;
+// Enterキーでも貼り付けボタンと同じ動作にする
+photoUrlInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    photoUrlBtn.click();
+  }
 });
 
 // リスト・タイル両方を画面に表示する
@@ -322,6 +300,14 @@ function createTileItem(food) {
     favBadge.className = 'tileFav';
     favBadge.textContent = '⭐';
     tile.appendChild(favBadge);
+  }
+
+  // 期間限定バッジ（対象期間が設定されている場合）
+  if (food.period) {
+    const periodBadge = document.createElement('div');
+    periodBadge.className = 'tileBadge';
+    periodBadge.textContent = '期間限定';
+    tile.appendChild(periodBadge);
   }
 
   // テキスト部分

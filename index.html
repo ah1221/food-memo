@@ -57,11 +57,24 @@
           <span class="photoPlaceholder">📷 写真がまだありません</span>
         </div>
         <div class="photoBtns">
-          <button type="button" id="photoAutoBtn" class="photoAutoBtn">🔄 自動取得</button>
-          <label for="photoInput" class="photoUploadBtn">📷 自分でアップ</label>
+          <button type="button" id="photoSearchBtn" class="photoSearchBtn">🔍 画像を探す</button>
+          <label for="photoInput" class="photoUploadBtn">📷 アップロード</label>
           <button type="button" id="photoDeleteBtn" class="photoDeleteBtn hidden">🗑️ 削除</button>
         </div>
         <input type="file" id="photoInput" accept="image/*" hidden>
+        <!-- 画像URL貼り付け欄 -->
+        <div class="photoUrlRow">
+          <input
+            type="text"
+            id="photoUrlInput"
+            placeholder="ここに画像URLを貼り付け（プレスリリース等）"
+            autocomplete="off"
+          >
+          <button type="button" id="photoUrlBtn" class="photoUrlBtn">貼り付け</button>
+        </div>
+        <p class="photoHint">
+          🔍 で検索 → 良さげな画像を右クリック → 「画像アドレスをコピー」→ ここに貼り付け
+        </p>
       </div>
 
       <p class="modalNote">どのサービスで探しますか？</p>

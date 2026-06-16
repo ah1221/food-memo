@@ -206,16 +206,39 @@ h1 {
 }
 
 .tileStore {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: #66d9ff;
   word-break: break-word;
+  margin-top: 4px;
 }
 
+/* タイル下部の期間・値段：目立つよう背景＋強調 */
 .tileMeta {
-  font-size: 0.7rem;
-  color: #ffb347;
-  margin-top: 2px;
+  display: block;
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: rgba(255, 179, 71, 0.12);
+  border-left: 3px solid #ffb347;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  color: #ffd166;
+  font-weight: bold;
   word-break: break-word;
+  line-height: 1.4;
+}
+
+/* 期間限定バッジ：画像の左上にオーバーレイ */
+.tileBadge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: #ff6b6b;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 /* タイルの右上にお気に入りマーク */
@@ -579,19 +602,70 @@ h1 {
   background: #ffdd88;
 }
 
-.photoAutoBtn {
+.photoSearchBtn {
   background: #66d9ff;
   color: #1a1a2e;
 }
 
-.photoAutoBtn:hover {
+.photoSearchBtn:hover {
   background: #88e4ff;
 }
 
-.photoAutoBtn:disabled {
-  background: #4a5570;
-  color: #9aa0b4;
-  cursor: not-allowed;
+/* 画像URL貼り付け欄 */
+.photoUrlRow {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+#photoUrlInput {
+  flex: 1;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  background: #25304a;
+  color: #fff;
+  border: 2px solid #2e3a55;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+  min-width: 0;
+}
+
+#photoUrlInput:focus {
+  border-color: #66d9ff;
+}
+
+#photoUrlInput::placeholder {
+  color: #6b7290;
+  font-size: 0.8rem;
+}
+
+.photoUrlBtn {
+  padding: 9px 14px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  background: #66d9ff;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.photoUrlBtn:hover {
+  background: #88e4ff;
+}
+
+.photoUrlBtn:active {
+  transform: scale(0.96);
+}
+
+.photoHint {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #6b7290;
+  line-height: 1.4;
 }
 
 .photoDeleteBtn {
