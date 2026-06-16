@@ -205,26 +205,15 @@ h1 {
   margin-bottom: 4px;
 }
 
-.tileStore {
-  font-size: 0.78rem;
-  color: #66d9ff;
-  word-break: break-word;
-  margin-top: 4px;
+/* タイル内のメタブロックは少し小さめ */
+.foodTile .metaBlock {
+  padding: 6px 8px;
+  margin-top: 6px;
 }
 
-/* タイル下部の期間・値段：目立つよう背景＋強調 */
-.tileMeta {
-  display: block;
-  margin-top: 8px;
-  padding: 6px 8px;
-  background: rgba(255, 179, 71, 0.12);
-  border-left: 3px solid #ffb347;
-  border-radius: 4px;
-  font-size: 0.78rem;
-  color: #ffd166;
-  font-weight: bold;
-  word-break: break-word;
-  line-height: 1.4;
+.foodTile .metaRow {
+  grid-template-columns: 56px 1fr;
+  font-size: 0.72rem;
 }
 
 /* 期間限定バッジ：画像の左上にオーバーレイ */
@@ -330,18 +319,41 @@ h1 {
   word-break: break-word;
 }
 
-/* 保存された店名の表示 */
-.storeName {
-  font-size: 0.85rem;
-  color: #66d9ff;
+/* 期間・値段・場所のまとめブロック */
+.metaBlock {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: rgba(255, 209, 102, 0.08);
+  border-left: 3px solid #ffd166;
+  border-radius: 6px;
+}
+
+.metaRow {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.metaLabel {
+  color: #ffd166;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.metaValue {
+  color: #e6e6e6;
   word-break: break-word;
 }
 
-/* 対象期間・値段の表示 */
-.metaInfo {
-  font-size: 0.8rem;
-  color: #ffb347;
-  word-break: break-word;
+/* 未設定の項目は薄い色で */
+.metaRow.metaEmpty .metaValue {
+  color: #6b7290;
+  font-style: italic;
 }
 
 /* インラインのクイックリンク（食べログ・Uber Eats・Maps） */

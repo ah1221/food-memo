@@ -23,8 +23,6 @@ const tileViewBtn = document.getElementById('tileViewBtn');
 const searchModal = document.getElementById('searchModal');
 const modalCloseBtn = document.getElementById('modalCloseBtn');
 const modalFoodName = document.getElementById('modalFoodName');
-const linkTabelog = document.getElementById('linkTabelog');
-const linkUberEats = document.getElementById('linkUberEats');
 const linkGoogleMaps = document.getElementById('linkGoogleMaps');
 const storeNameInput = document.getElementById('storeNameInput');
 const periodInput = document.getElementById('periodInput');
@@ -191,44 +189,23 @@ function createListItem(food) {
   nameSpan.textContent = food.name;
   textBlock.appendChild(nameSpan);
 
-    // 店名のメモ（保存されている場合のみ表示）
-    if (food.storeName) {
-      const storeSpan = document.createElement('span');
-      storeSpan.className = 'storeName';
-      storeSpan.textContent = `📍 ${food.storeName}`;
-      textBlock.appendChild(storeSpan);
-    }
+  // 期間・値段・場所を必ず表示するブロック
+  const metaBlock = createMetaBlock(food);
+  textBlock.appendChild(metaBlock);
 
-    // 期間・値段の表示（どちらかが入っていれば表示）
-    if (food.period || food.price) {
-      const metaSpan = document.createElement('span');
-      metaSpan.className = 'metaInfo';
-      const parts = [];
-      if (food.period) parts.push(`🏷️ ${food.period}`);
-      if (food.price) parts.push(`💴 ${food.price}`);
-      metaSpan.textContent = parts.join('  ');
-      textBlock.appendChild(metaSpan);
-    }
-
-    // 検索サービスへの直リンクをインラインで貼る
-    const quickLinks = document.createElement('div');
-    quickLinks.className = 'quickLinks';
-    const encoded = encodeURIComponent(food.name);
-    const services = [
-      { label: '🍽️ 食べログ', url: `https://tabelog.com/rstLst/?vs=1&sk=${encoded}` },
-      { label: '🛵 Uber Eats', url: `https://www.ubereats.com/jp/search?q=${encoded}` },
-      { label: '🗺️ Maps', url: `https://www.google.com/maps/search/${encoded}` }
-    ];
-    services.forEach((service) => {
-      const link = document.createElement('a');
-      link.className = 'quickLink';
-      link.href = service.url;
-      link.target = '_blank';
-      link.rel = 'noopener';
-      link.textContent = service.label;
-      quickLinks.appendChild(link);
-    });
-    textBlock.appendChild(quickLinks);
+  // Google Maps への直リンクをインラインで貼る
+  const quickLinks = document.createElement('div');
+  quickLinks.className = 'quickLinks';
+  // Maps検索は「料理名 + 店名」で行うとお店にヒットしやすい
+  const mapsQuery = food.storeName ? `${food.name} ${food.storeName}` : food.name;
+  const mapsLink = document.createElement('a');
+  mapsLink.className = 'quickLink';
+  mapsLink.href = `https://www.google.com/maps/search/${encodeURIComponent(mapsQuery)}`;
+  mapsLink.target = '_blank';
+  mapsLink.rel = 'noopener';
+  mapsLink.textContent = '🗺️ Mapsで開く';
+  quickLinks.appendChild(mapsLink);
+  textBlock.appendChild(quickLinks);
 
     // お気に入りボタン
     const favBtn = document.createElement('button');
@@ -264,6 +241,39 @@ function createListItem(food) {
   li.appendChild(eatBtn);
   li.appendChild(deleteBtn);
   return li;
+}
+
+// 期間・値段・場所をまとめて表示するブロックを作る
+// 値が空の項目には「-」を入れて、常に3行とも見えるようにする
+function createMetaBlock(food) {
+  const wrap = document.createElement('div');
+  wrap.className = 'metaBlock';
+
+  const items = [
+    { icon: '🏷️', label: '期間', value: food.period },
+    { icon: '💴', label: '値段', value: food.price },
+    { icon: '📍', label: '場所', value: food.storeName }
+  ];
+
+  items.forEach((item) => {
+    const row = document.createElement('div');
+    row.className = 'metaRow';
+    if (!item.value) row.classList.add('metaEmpty');
+
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'metaLabel';
+    labelSpan.textContent = `${item.icon} ${item.label}`;
+
+    const valueSpan = document.createElement('span');
+    valueSpan.className = 'metaValue';
+    valueSpan.textContent = item.value ? item.value : '未設定';
+
+    row.appendChild(labelSpan);
+    row.appendChild(valueSpan);
+    wrap.appendChild(row);
+  });
+
+  return wrap;
 }
 
 // タイル1件分の要素を作る
@@ -319,22 +329,8 @@ function createTileItem(food) {
   tileName.textContent = food.name;
   text.appendChild(tileName);
 
-  if (food.storeName) {
-    const store = document.createElement('div');
-    store.className = 'tileStore';
-    store.textContent = `📍 ${food.storeName}`;
-    text.appendChild(store);
-  }
-
-  if (food.period || food.price) {
-    const meta = document.createElement('div');
-    meta.className = 'tileMeta';
-    const parts = [];
-    if (food.period) parts.push(`🏷️ ${food.period}`);
-    if (food.price) parts.push(`💴 ${food.price}`);
-    meta.textContent = parts.join('  ');
-    text.appendChild(meta);
-  }
+  // 期間・値段・場所をまとめて表示（必ず3行表示）
+  text.appendChild(createMetaBlock(food));
 
   tile.appendChild(text);
   return tile;
@@ -414,13 +410,12 @@ function openSearchModal(foodId, foodName) {
   // 食べ物名を表示にセット
   modalFoodName.textContent = foodName;
 
-  // URL用にエンコード
-  const encoded = encodeURIComponent(foodName);
-
-  // 各サービスの検索URLを生成
-  linkTabelog.href = `https://tabelog.com/rstLst/?vs=1&sk=${encoded}`;
-  linkUberEats.href = `https://www.ubereats.com/jp/search?q=${encoded}`;
-  linkGoogleMaps.href = `https://www.google.com/maps/search/${encoded}`;
+  // Maps検索URLを生成（料理名 + 店名 でヒット精度UP）
+  const targetForMaps = foods.find((food) => food.id === foodId);
+  const mapsQuery = targetForMaps && targetForMaps.storeName
+    ? `${foodName} ${targetForMaps.storeName}`
+    : foodName;
+  linkGoogleMaps.href = `https://www.google.com/maps/search/${encodeURIComponent(mapsQuery)}`;
 
   // 既に保存されている内容を各入力欄に反映
   const targetFood = foods.find((food) => food.id === foodId);
@@ -575,10 +570,8 @@ storeNameInput.addEventListener('input', () => saveStoreDetails(storeNameInput))
 periodInput.addEventListener('input', () => saveStoreDetails(periodInput));
 priceInput.addEventListener('input', () => saveStoreDetails(priceInput));
 
-// サービスリンクをクリックしたら、その時点の入力内容を保存
-[linkTabelog, linkUberEats, linkGoogleMaps].forEach((link) => {
-  link.addEventListener('click', () => saveStoreDetails(storeNameInput));
-});
+// Mapsリンクをクリックしたら、その時点の入力内容を保存
+linkGoogleMaps.addEventListener('click', () => saveStoreDetails(storeNameInput));
 
 // オーバーレイ部分をクリックでも閉じる
 searchModal.addEventListener('click', (event) => {
